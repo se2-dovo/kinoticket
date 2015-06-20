@@ -58,7 +58,7 @@ public class Vorstellung
         assert anfangszeit != null : "Vorbedingung verletzt: anfangszeit != null";
         assert endzeit != null : "Vorbedingung verletzt: endzeit != null";
         assert datum != null : "Vorbedingung verletzt: datum != null";
-        assert preis > 0: "Vorbedingung verletzt: preis > 0";
+        assert preis > 0 : "Vorbedingung verletzt: preis > 0";
 
         _kinosaal = kinosaal;
         _film = film;
@@ -66,8 +66,7 @@ public class Vorstellung
         _endzeit = endzeit;
         _datum = datum;
         _preis = preis;
-        _verkauft = new boolean[kinosaal.getAnzahlReihen()][kinosaal
-                .getAnzahlSitzeProReihe()];
+        _verkauft = new boolean[kinosaal.getAnzahlReihen()][kinosaal.getAnzahlSitzeProReihe()];
         _anzahlVerkauftePlaetze = 0;
     }
 
@@ -179,7 +178,7 @@ public class Vorstellung
     }
 
     /**
-     * Gibt den Gesamtpreis für die angegebenen Plätze zurücke
+     * Gibt den Gesamtpreis für die angegebenen Plätze zurück
      * 
      * @param plaetze die Sitzplätze.
      * 
@@ -191,7 +190,30 @@ public class Vorstellung
     {
         assert hatPlaetze(plaetze) : "Vorbedingung verletzt: hatPlaetze(plaetze)";
 
-        return _preis * plaetze.size();
+        int result = 0;
+
+        for (Platz p : plaetze)
+        {
+            result += getPreisFuerPlatz(p);
+        }
+
+        return result;
+    }
+
+    /**
+     * Gibt den Einzelpreis für den angegebenen Platz zurück
+     * 
+     * @param platz der Sitzplatz.
+     * 
+     * @return Einzelpreis in Eurocent
+     * 
+     * @require hatPlatz(platz)
+     */
+    public int getPreisFuerPlatz(Platz platz)
+    {
+        assert hatPlatz(platz) : "Vorbedingung verletzt: hatPlatz(platz)";
+
+        return getPreis();
     }
 
     /**
