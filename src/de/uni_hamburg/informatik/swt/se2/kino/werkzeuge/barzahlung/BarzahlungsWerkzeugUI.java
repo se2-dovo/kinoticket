@@ -1,6 +1,7 @@
 package de.uni_hamburg.informatik.swt.se2.kino.werkzeuge.barzahlung;
 
 import java.awt.BorderLayout;
+import java.awt.ComponentOrientation;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -10,14 +11,14 @@ import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
 import javax.swing.ListSelectionModel;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.text.MaskFormatter;
 
 import de.uni_hamburg.informatik.swt.se2.kino.fachwerte.Platz;
 import de.uni_hamburg.informatik.swt.se2.kino.materialien.Vorstellung;
@@ -72,13 +73,23 @@ class BarzahlungsWerkzeugUI extends JDialog
 
         center.add(menuScrollPane);
 
-        SpinnerModel model = new SpinnerNumberModel(
-                vorstellung.getPreisFuerPlaetze(plaetze), //initial value
-                vorstellung.getPreisFuerPlaetze(plaetze), //min
-                50000, //max
-                100); //step
-        JSpinner inputField = new JSpinner(model);
-        center.add(inputField);
+        JPanel panel = new JPanel();
+        JLabel label = new JLabel("Number :");
+        JFormattedTextField tf = null;
+        try
+        {
+            tf = new JFormattedTextField(new MaskFormatter("##.###"));
+        }
+        catch (java.text.ParseException exc)
+        {
+            System.err.println("formatter is bad: " + exc.getMessage());
+            System.exit(-1);
+        }
+        tf.setColumns(10);
+        tf.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        panel.add(label);
+        panel.add(tf);
+        center.add(panel);
         center.add(menuScrollPane);
 
         this.add(center, BorderLayout.CENTER);
