@@ -28,6 +28,8 @@ class KassenWerkzeugUI
      * http://tango.freedesktop.org/
      */
 
+    private static final String TITEL = "SE2-Kinokartenverkauf SoSe 2015";
+
     // Die Widgets, aus denen das UI sich zusammensetzt
     private JFrame _frame;
     private JButton _beendenButton;
@@ -39,7 +41,7 @@ class KassenWerkzeugUI
     public KassenWerkzeugUI(JPanel platzVerkaufsPanel,
             JPanel datumAuswaehlPanel, JPanel vorstellungAuswaehlPanel)
     {
-        _frame = new JFrame("SE2-Kinokartenverkauf Vorlage Blatt 07 SoSe 2015");
+        _frame = new JFrame(TITEL);
         _frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         _frame.getContentPane().setLayout(new BorderLayout());
 
@@ -103,9 +105,7 @@ class KassenWerkzeugUI
     private JPanel erstelleUeberschriftPanel()
     {
         JPanel topPanel = new JPanel();
-        JLabel label = new JLabel(
-                "SE2-Kinokartenverkauf Vorlage Blatt 07 SoSe 2015",
-                SwingConstants.CENTER);
+        JLabel label = new JLabel(TITEL, SwingConstants.CENTER);
 
         Font font = label.getFont().deriveFont(Font.BOLD + Font.ITALIC, 20);
         label.setFont(font);

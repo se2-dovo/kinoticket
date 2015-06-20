@@ -15,8 +15,8 @@ class VorstellungsFormatierer
     /**
      * Initialisiert einen Formatierer für die angegebene Vorstellung.
      * 
-     * @param vorstellung die Vorstellung, die von diesem Formatierer
-     *            dargestellt wird.
+     * @param vorstellung
+     *            die Vorstellung, die von diesem Formatierer dargestellt wird.
      */
     public VorstellungsFormatierer(Vorstellung vorstellung)
     {

@@ -8,7 +8,7 @@ import javax.swing.event.ListSelectionListener;
 
 import de.uni_hamburg.informatik.swt.se2.kino.materialien.Tagesplan;
 import de.uni_hamburg.informatik.swt.se2.kino.materialien.Vorstellung;
-import de.uni_hamburg.informatik.swt.se2.kino.werkzeuge.Beobachtbar;
+import de.uni_hamburg.informatik.swt.se2.kino.werkzeuge.ObservableSubwerkzeug;
 
 /**
  * Mit diesem Werkzeug kann der Benutzer oder die Benutzerin eine Vorstellung
@@ -17,7 +17,7 @@ import de.uni_hamburg.informatik.swt.se2.kino.werkzeuge.Beobachtbar;
  * Dieses Werkzeug ist ein eingebettetes Subwerkzeug. Es benachrichtigt seine
  * Beobachter, wenn sich die ausgewählte Vorstellung geändert hat.
  */
-public class VorstellungsAuswaehlWerkzeug extends Beobachtbar
+public class VorstellungsAuswaehlWerkzeug extends ObservableSubwerkzeug
 {
     private VorstellungsAuswaehlWerkzeugUI _ui;
 
@@ -53,14 +53,16 @@ public class VorstellungsAuswaehlWerkzeug extends Beobachtbar
     }
 
     /**
-     * Gibt die derzeit ausgewählte Vorstellung zurück. Wenn keine Vorstellung
-     * ausgewählt ist, wird <code>null</code> zurückgegeben.
+     * Gibt die derzeit ausgewählte Vorstellung zurück.
+     * 
+     * @return die derzeitig ausgewählte Vorstellung, oder null, wenn keine
+     *         Vorstellung ausgewählt ist.
      */
     public Vorstellung getAusgewaehlteVorstellung()
     {
         Vorstellung result = null;
         VorstellungsFormatierer adapter = _ui.getVorstellungAuswahlList()
-            .getSelectedValue();
+                .getSelectedValue();
         if (adapter != null)
         {
             result = adapter.getVorstellung();
@@ -89,15 +91,14 @@ public class VorstellungsAuswaehlWerkzeug extends Beobachtbar
     private void aktualisiereAngezeigteVorstellungsliste(
             List<Vorstellung> vorstellungen)
     {
-        VorstellungsFormatierer[] varray = new VorstellungsFormatierer[vorstellungen.size()];
+        VorstellungsFormatierer[] varray = new VorstellungsFormatierer[vorstellungen
+                .size()];
         for (int i = 0; i < vorstellungen.size(); i++)
         {
             varray[i] = new VorstellungsFormatierer(vorstellungen.get(i));
         }
-        _ui.getVorstellungAuswahlList()
-            .setListData(varray);
-        _ui.getVorstellungAuswahlList()
-            .setSelectedIndex(0);
+        _ui.getVorstellungAuswahlList().setListData(varray);
+        _ui.getVorstellungAuswahlList().setSelectedIndex(0);
     }
 
     /**
@@ -107,17 +108,17 @@ public class VorstellungsAuswaehlWerkzeug extends Beobachtbar
      */
     private void registriereUIAktionen()
     {
-        _ui.getVorstellungAuswahlList()
-            .addListSelectionListener(new ListSelectionListener()
-            {
-                @Override
-                public void valueChanged(ListSelectionEvent event)
+        _ui.getVorstellungAuswahlList().addListSelectionListener(
+                new ListSelectionListener()
                 {
-                    if (!event.getValueIsAdjusting())
+                    @Override
+                    public void valueChanged(ListSelectionEvent event)
                     {
-                        vorstellungWurdeAusgewaehlt();
+                        if (!event.getValueIsAdjusting())
+                        {
+                            vorstellungWurdeAusgewaehlt();
+                        }
                     }
-                }
-            });
+                });
     }
 }

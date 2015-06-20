@@ -22,15 +22,17 @@ class PlatzSelectionEvent extends EventObject
     /**
      * Erstellt ein neues PlatzSelectionEvent.
      * 
-     * @param source Das Objekt, von dem das Ereignis ausgelöst wurde.
-     * @param ausgewaehltePlaetze die Menge der ausgewählten Plätze.
+     * @param source
+     *            Das Objekt, von dem das Ereignis ausgelöst wurde.
+     * @param ausgewaehltePlaetze
+     *            die Menge der ausgewählten Plätze.
      */
     public PlatzSelectionEvent(Object source, Set<Platz> ausgewaehltePlaetze)
     {
         super(source);
         _ausgewaehltePlaetze = new HashSet<Platz>(ausgewaehltePlaetze);
     }
-
+    
     /**
      * Gibt die Menge der nach diesem Ereignis ausgewählten Plätze zurück.
      */
@@ -38,7 +40,7 @@ class PlatzSelectionEvent extends EventObject
     {
         return _ausgewaehltePlaetze;
     }
-
+    
     @Override
     public String toString()
     {

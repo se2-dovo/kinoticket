@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 
 import de.uni_hamburg.informatik.swt.se2.kino.fachwerte.Datum;
-import de.uni_hamburg.informatik.swt.se2.kino.werkzeuge.Beobachtbar;
+import de.uni_hamburg.informatik.swt.se2.kino.werkzeuge.ObservableSubwerkzeug;
 
 /**
  * Mit diesem Werkzeug kann ein Datum ausgewählt werden.
@@ -17,7 +17,7 @@ import de.uni_hamburg.informatik.swt.se2.kino.werkzeuge.Beobachtbar;
  * @author SE2-Team
  * @version SoSe 2015
  */
-public class DatumAuswaehlWerkzeug extends Beobachtbar
+public class DatumAuswaehlWerkzeug extends ObservableSubwerkzeug
 {
     private DatumAuswaehlWerkzeugUI _ui;
     private Datum _ausgewaehltesDatum;
@@ -41,8 +41,7 @@ public class DatumAuswaehlWerkzeug extends Beobachtbar
     {
         _ausgewaehltesDatum = _ausgewaehltesDatum.vorherigerTag();
         _ui.getDatumLabel()
-            .setText(_ausgewaehltesDatum.getFormatiertenString());
-
+                .setText(_ausgewaehltesDatum.getFormatiertenString());
         informiereUeberAenderung();
     }
 
@@ -53,8 +52,7 @@ public class DatumAuswaehlWerkzeug extends Beobachtbar
     {
         _ausgewaehltesDatum = _ausgewaehltesDatum.naechsterTag();
         _ui.getDatumLabel()
-            .setText(_ausgewaehltesDatum.getFormatiertenString());
-
+                .setText(_ausgewaehltesDatum.getFormatiertenString());
         informiereUeberAenderung();
     }
 
@@ -85,24 +83,22 @@ public class DatumAuswaehlWerkzeug extends Beobachtbar
      */
     private void registriereUIAktionen()
     {
-        _ui.getZurueckButton()
-            .addActionListener(new ActionListener()
+        _ui.getZurueckButton().addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
             {
-                @Override
-                public void actionPerformed(ActionEvent e)
-                {
-                    zurueckButtonWurdeGedrueckt();
-                }
-            });
+                zurueckButtonWurdeGedrueckt();
+            }
+        });
 
-        _ui.getWeiterButton()
-            .addActionListener(new ActionListener()
+        _ui.getWeiterButton().addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
             {
-                @Override
-                public void actionPerformed(ActionEvent e)
-                {
-                    weiterButtonWurdeGedrueckt();
-                }
-            });
+                weiterButtonWurdeGedrueckt();
+            }
+        });
     }
 }

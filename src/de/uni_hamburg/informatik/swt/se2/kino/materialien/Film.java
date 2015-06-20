@@ -19,10 +19,14 @@ public class Film
     /**
      * Initialisiert einen neuen Film.
      * 
-     * @param titel der Titel.
-     * @param laenge die Laenge in Minuten.
-     * @param fsk die Altersfreigabe fuer diesen Film.
-     * @param ueberlaenge hat der Film Überlaenge?
+     * @param titel
+     *            der Titel.
+     * @param laenge
+     *            die Laenge in Minuten.
+     * @param fsk
+     *            die Altersfreigabe fuer diesen Film.
+     * @param ueberlaenge
+     *            hat der Film Überlaenge?
      * 
      * @require titel != null
      * @require laenge > 0
