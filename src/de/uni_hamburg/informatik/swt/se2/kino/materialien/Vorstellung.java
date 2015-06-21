@@ -3,6 +3,7 @@ package de.uni_hamburg.informatik.swt.se2.kino.materialien;
 import java.util.Set;
 
 import de.uni_hamburg.informatik.swt.se2.kino.fachwerte.Datum;
+import de.uni_hamburg.informatik.swt.se2.kino.fachwerte.Geldbetrag;
 import de.uni_hamburg.informatik.swt.se2.kino.fachwerte.Platz;
 import de.uni_hamburg.informatik.swt.se2.kino.fachwerte.Uhrzeit;
 
@@ -22,7 +23,7 @@ public class Vorstellung
     private Uhrzeit _anfangszeit;
     private Uhrzeit _endzeit;
     private Datum _datum;
-    private int _preis;
+    private Geldbetrag _preis;
     private boolean[][] _verkauft;
     private int _anzahlVerkauftePlaetze;
 
@@ -41,24 +42,24 @@ public class Vorstellung
      * @require anfangszeit != null
      * @require endzeit != null
      * @require datum != null
-     * @require preis > 0
+     * @require preis.getEuroCent() > 0
      * 
      * @ensure getKinosaal() == kinosaal
      * @ensure getFilm() == film
      * @ensure getAnfangszeit() == anfangszeit
      * @ensure getEndzeit() == endzeit
      * @ensure getDatum() == datum
-     * @ensure getPreis() == preis
+     * @ensure getPreis() == preis.getEuroCent()
      */
     public Vorstellung(Kinosaal kinosaal, Film film, Uhrzeit anfangszeit,
-            Uhrzeit endzeit, Datum datum, int preis)
+            Uhrzeit endzeit, Datum datum, Geldbetrag preis)
     {
         assert kinosaal != null : "Vorbedingung verletzt: saal != null";
         assert film != null : "Vorbedingung verletzt: film != null";
         assert anfangszeit != null : "Vorbedingung verletzt: anfangszeit != null";
         assert endzeit != null : "Vorbedingung verletzt: endzeit != null";
         assert datum != null : "Vorbedingung verletzt: datum != null";
-        assert preis > 0 : "Vorbedingung verletzt: preis > 0";
+        assert preis.getEuroCent() > 0 : "Vorbedingung verletzt: preis > 0";
 
         _kinosaal = kinosaal;
         _film = film;
@@ -127,7 +128,17 @@ public class Vorstellung
      */
     public int getPreis()
     {
-        return _preis;
+        return _preis.getEuroCent();
+    }
+
+    /**
+     * Gibt den Verkaufspreis in als Geldbetrag für Karten zu dieser Vorstellung
+     * zurück.
+     * 
+     */
+    public Geldbetrag getPreisGeldwert()
+    {
+        return new Geldbetrag(getPreis());
     }
 
     /**
