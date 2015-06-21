@@ -2,6 +2,7 @@ package de.uni_hamburg.informatik.swt.se2.kino.werkzeuge.barzahlung;
 
 import java.util.Set;
 
+import de.uni_hamburg.informatik.swt.se2.kino.fachwerte.Geldbetrag;
 import de.uni_hamburg.informatik.swt.se2.kino.fachwerte.Platz;
 import de.uni_hamburg.informatik.swt.se2.kino.materialien.Vorstellung;
 
@@ -15,7 +16,8 @@ public class BarzahlungsWerkzeug
         BarzahlungsWerkzeugUI cashWindow = new BarzahlungsWerkzeugUI(null,
                 setUpTickets(plaetze, vorstellung), vorstellung.getFilm()
                     .getTitel(), vorstellung.getKinosaal()
-                    .getName());
+                    .getName(), new Geldbetrag(
+                        vorstellung.getPreisFuerPlaetze(plaetze)));
 
         cashWindow.setVisible(true);
         return cashWindow.getResult();
