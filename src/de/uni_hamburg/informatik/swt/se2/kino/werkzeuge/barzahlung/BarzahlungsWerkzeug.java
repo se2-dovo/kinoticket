@@ -11,10 +11,31 @@ public class BarzahlungsWerkzeug
     public static boolean performPayment(Set<Platz> plaetze,
             Vorstellung vorstellung)
     {
+
         BarzahlungsWerkzeugUI cashWindow = new BarzahlungsWerkzeugUI(null,
-                plaetze, vorstellung);
+                setUpTickets(plaetze, vorstellung), vorstellung.getFilm()
+                    .getTitel(), vorstellung.getKinosaal()
+                    .getName());
+
         cashWindow.setVisible(true);
         return cashWindow.getResult();
     }
 
+    private static String[] setUpTickets(Set<Platz> plaetze,
+            Vorstellung vorstellung)
+    {
+        int i = -1;
+        String[] ticketliste = new String[plaetze.size()];
+        for (Platz platz : plaetze)
+        {
+            ++i;
+            ticketliste[i] = "Film: " + vorstellung.getFilm()
+                .getTitel() + " | R:" + platz.getReihe() + " S:"
+                    + platz.getSitz() + " | Preis: "
+                    + vorstellung.getGeldbetragFuerPlatz(platz)
+                        .getFormatiertenString() + "€";
+        }
+
+        return ticketliste;
+    }
 }

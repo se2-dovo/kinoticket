@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -20,16 +19,13 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.text.MaskFormatter;
 
-import de.uni_hamburg.informatik.swt.se2.kino.fachwerte.Platz;
-import de.uni_hamburg.informatik.swt.se2.kino.materialien.Vorstellung;
-
 @SuppressWarnings("serial")
 class BarzahlungsWerkzeugUI extends JDialog
 {
     private boolean _result;
 
-    public BarzahlungsWerkzeugUI(JFrame frame, Set<Platz> plaetze,
-            Vorstellung vorstellung)
+    public BarzahlungsWerkzeugUI(JFrame frame, String[] ticketliste,
+            String film, String kinosal)
     {
         super(frame, "Barzahlung");
 
@@ -42,31 +38,12 @@ class BarzahlungsWerkzeugUI extends JDialog
         this.setLocationRelativeTo(frame);
         this.setLayout(new BorderLayout());
 
-        /*vorstellung.getDatum();
-        vorstellung.getFilm();
-        vorstellung.getKinosaal();
-        vorstellung.getPreisFuerPlaetze(plaetze);
-
-        for (Platz platz : plaetze)
-        {
-            vorstellung.getPreisFuerPlatz(platz);
-        }
-        */
-
         JPanel center = new JPanel(new GridLayout(3, 1));
 
-        /*ArrayList<String> tickets = new ArrayList<String>();
-        //String[] tickets
-        System.out.println("Foo" + plaetze.size());
-        for (Platz platz : plaetze)
-        {
-            tickets.add("Platz: " + platz.getReihe() + "|" + platz.getSitz()
-                    + " - " + vorstellung.getPreisFuerPlatz(platz));
-        }*/
-        String[] foo = {"foas", "asd", "asd", "asd", "asd", "asd", "asd"};
-        JList menuList = new JList(foo);
+        JList<String> menuList = new JList<String>(ticketliste);
         menuList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         menuList.setLayoutOrientation(JList.VERTICAL);
+
         JScrollPane menuScrollPane = new JScrollPane(menuList);
         menuScrollPane.setMinimumSize(new Dimension(100, 50));
         menuList.setVisibleRowCount(4);

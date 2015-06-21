@@ -136,7 +136,7 @@ public class Vorstellung
      * zurück.
      * 
      */
-    public Geldbetrag getPreisGeldwert()
+    public Geldbetrag getGeldbetrag()
     {
         return new Geldbetrag(getPreis());
     }
@@ -225,6 +225,45 @@ public class Vorstellung
         assert hatPlatz(platz) : "Vorbedingung verletzt: hatPlatz(platz)";
 
         return getPreis();
+    }
+
+    /**
+     * Gibt den Gesamtpreis für die angegebenen Plätze zurück
+     * 
+     * @param plaetze die Sitzplätze.
+     * 
+     * @return Gesamtpreis in Eurocent
+     * 
+     * @require hatPlaetze(plaetze)
+     */
+    public Geldbetrag getGeldbetragFuerPlaetze(Set<Platz> plaetze)
+    {
+        assert hatPlaetze(plaetze) : "Vorbedingung verletzt: hatPlaetze(plaetze)";
+
+        int result = 0;
+
+        for (Platz p : plaetze)
+        {
+            result += getPreisFuerPlatz(p);
+        }
+
+        return new Geldbetrag(result);
+    }
+
+    /**
+     * Gibt den Einzelpreis für den angegebenen Platz zurück
+     * 
+     * @param platz der Sitzplatz.
+     * 
+     * @return Einzelpreis in Eurocent
+     * 
+     * @require hatPlatz(platz)
+     */
+    public Geldbetrag getGeldbetragFuerPlatz(Platz platz)
+    {
+        assert hatPlatz(platz) : "Vorbedingung verletzt: hatPlatz(platz)";
+
+        return getGeldbetrag();
     }
 
     /**
