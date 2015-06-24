@@ -26,8 +26,7 @@ import javax.swing.text.MaskFormatter;
 
 import de.uni_hamburg.informatik.swt.se2.kino.fachwerte.Geldbetrag;
 
-@SuppressWarnings("serial")
-class BarzahlungsWerkzeugUI extends JDialog {
+class BarzahlungsWerkzeugUI {
 	private boolean _result;
 
 	private final Geldbetrag _toPay;
@@ -40,7 +39,8 @@ class BarzahlungsWerkzeugUI extends JDialog {
 	private final String txtCALC = "" + " Zu zahlen:  %6.2f €\n"
 			+ " --------------------\n" + " Gegeben:    %6.2f €\n"
 			+ " Rückgeld:   %6.2f €";
-
+	private JFrame _owner;
+	private JDialog _dialog;
 	private JButton _btnCancel;
 	private JButton _btnConfirm;
 	private JFormattedTextField _fInpCash;
@@ -48,46 +48,29 @@ class BarzahlungsWerkzeugUI extends JDialog {
 
 	public BarzahlungsWerkzeugUI(JFrame frame, String[] ticketliste, String film,
 			String kinosaal, Geldbetrag zuZahlen) {
-		super(frame, String.format("Barzahlung - %s - %s", film, kinosaal));
 
+		_owner = frame;
 		_toPay = zuZahlen;
 		_ticketArray = ticketliste;
 		_movie = film;
 		_hall = kinosaal;
 
-		// ########## Frame init ##########
-		this.setMinimumSize(new Dimension(400, 400));
-		this.setPreferredSize(new Dimension(500, 450));
-		this.setMaximumSize(new Dimension(1920, 800));
-		this.setAlwaysOnTop(true);
-		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-		this.setLocationRelativeTo(frame);
-		this.getContentPane()
-			.setLayout(new BorderLayout(0, 10));
-
 		_btnConfirm = this.initButtonConfirm();
 		_btnCancel = this.initButtonCancel();
 		_txtCalc = this.initTextArea();
 		this.initInputField(); // _fInpCash
-
-		// ########## BL - Center ##########
-		JPanel pnlcenter = this.initCenter();
-		this.getContentPane()
-			.add(pnlcenter, BorderLayout.CENTER);
-
-		// ########## BL - Bottom ##########
-		JPanel pnlbottom = this.initBottom();
-		this.getContentPane()
-			.add(pnlbottom, BorderLayout.PAGE_END);
-
-		this.pack();
+		_dialog = this.initDialog();
 
 		this.recalc();
 	}
 
 	public boolean getResult() {
 		return _result;
+	}
+
+	public void show() {
+		_dialog.setVisible(true);
+
 	}
 
 	private JPanel initBottom() {
@@ -110,7 +93,7 @@ class BarzahlungsWerkzeugUI extends JDialog {
 
 		button.addActionListener(ae -> {
 			_result = false;
-			BarzahlungsWerkzeugUI.this.dispose();
+			_dialog.dispose();
 		});
 
 		return button;
@@ -120,7 +103,7 @@ class BarzahlungsWerkzeugUI extends JDialog {
 		JButton button = new JButton("Zahlung abschließen");
 		button.addActionListener(ae -> {
 			_result = true;
-			BarzahlungsWerkzeugUI.this.dispose();
+			_dialog.dispose();
 		});
 		button.setEnabled(false);
 
@@ -172,6 +155,34 @@ class BarzahlungsWerkzeugUI extends JDialog {
 		return panel;
 	}
 
+	private JDialog initDialog() {
+		JDialog dialog = new JDialog(_owner, String.format("Barzahlung - %s - %s",
+				_movie, _hall));
+		dialog.setMinimumSize(new Dimension(400, 400));
+		dialog.setPreferredSize(new Dimension(500, 450));
+		dialog.setMaximumSize(new Dimension(1920, 800));
+		dialog.setAlwaysOnTop(true);
+		dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+		dialog.setLocationRelativeTo(_owner);
+		dialog.getContentPane()
+			.setLayout(new BorderLayout(0, 10));
+
+		// ########## BL - Center ##########
+		JPanel pnlcenter = this.initCenter();
+		dialog.getContentPane()
+			.add(pnlcenter, BorderLayout.CENTER);
+
+		// ########## BL - Bottom ##########
+		JPanel pnlbottom = this.initBottom();
+		dialog.getContentPane()
+			.add(pnlbottom, BorderLayout.PAGE_END);
+
+		dialog.pack();
+
+		return dialog;
+	}
+
 	private void initInputField() {
 		try {
 			_fInpCash = new JFormattedTextField(new MaskFormatter("###.##€"));
@@ -205,7 +216,6 @@ class BarzahlungsWerkzeugUI extends JDialog {
 	private JTextArea initTextArea() {
 		JTextArea textarea = new JTextArea();
 		textarea.setFont(new Font(Font.MONOSPACED, Font.BOLD, 16));
-		textarea.setBackground(this.getBackground());
 
 		return textarea;
 	}
