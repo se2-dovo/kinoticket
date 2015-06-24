@@ -5,14 +5,12 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.text.ParseException;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
@@ -31,27 +29,26 @@ import de.uni_hamburg.informatik.swt.se2.kino.fachwerte.Geldbetrag;
 @SuppressWarnings("serial")
 class BarzahlungsWerkzeugUI extends JDialog {
 	private boolean _result;
+
+	private final Geldbetrag _toPay;
+	private final String _movie;
+	private final String _hall;
+	private String[] _ticketArray;
+
+	private final String txtNOCALC = "" + " Zu zahlen:  %6.2f €\n"
+			+ "\n Bitte Eingabefeld anpassen!\n";
+	private final String txtCALC = "" + " Zu zahlen:  %6.2f €\n"
+			+ " --------------------\n" + " Gegeben:    %6.2f €\n"
+			+ " Rückgeld:   %6.2f €";
+
 	private JButton _btnCancel;
 	private JButton _btnConfirm;
 	private JFormattedTextField _fInpCash;
 	private JTextArea _txtCalc;
 
-	private Geldbetrag _toPay;
-	private String[] _ticketArray;
-	private String _movie;
-	private String _hall;
-
-	private final String txtNOCALC = "\n\n Bitte Eingabefeld anpassen!\n";
-	private final String txtCALC = ""
-			+ " Zu zahlen:  %6.2f €\n"
-			+ " --------------------\n"
-			+ " Gegeben:    %6.2f €\n"
-			+ " Rückgeld:   %6.2f €";
-
-	public BarzahlungsWerkzeugUI(JFrame frame, String[] ticketliste,
-			String film, String kinosaal, Geldbetrag zuZahlen) {
-
-		super(frame, "Barzahlung - " + film);
+	public BarzahlungsWerkzeugUI(JFrame frame, String[] ticketliste, String film,
+			String kinosaal, Geldbetrag zuZahlen) {
+		super(frame, String.format("Barzahlung - %s - %s", film, kinosaal));
 
 		_toPay = zuZahlen;
 		_ticketArray = ticketliste;
@@ -59,33 +56,33 @@ class BarzahlungsWerkzeugUI extends JDialog {
 		_hall = kinosaal;
 
 		// ########## Frame init ##########
-		this.setMinimumSize(new Dimension(
-				400, 400));
-		this.setPreferredSize(new Dimension(
-				500, 450));
-		this.setMaximumSize(new Dimension(
-				1920, 800));
+		this.setMinimumSize(new Dimension(400, 400));
+		this.setPreferredSize(new Dimension(500, 450));
+		this.setMaximumSize(new Dimension(1920, 800));
 		this.setAlwaysOnTop(true);
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
 		this.setLocationRelativeTo(frame);
 		this.getContentPane()
-		.setLayout(new BorderLayout(
-				0, 10));
+			.setLayout(new BorderLayout(0, 10));
+
+		_btnConfirm = this.initButtonConfirm();
+		_btnCancel = this.initButtonCancel();
+		_txtCalc = this.initTextArea();
+		this.initInputField(); // _fInpCash
 
 		// ########## BL - Center ##########
-		JPanel center = new JPanel();
-		this.initCenter(center);
+		JPanel pnlcenter = this.initCenter();
 		this.getContentPane()
-		.add(center, BorderLayout.CENTER);
+			.add(pnlcenter, BorderLayout.CENTER);
 
 		// ########## BL - Bottom ##########
-		JPanel bottom = new JPanel();
-		this.initBottom(bottom);
+		JPanel pnlbottom = this.initBottom();
 		this.getContentPane()
-		.add(bottom, BorderLayout.PAGE_END);
+			.add(pnlbottom, BorderLayout.PAGE_END);
 
 		this.pack();
+
 		this.recalc();
 	}
 
@@ -93,168 +90,165 @@ class BarzahlungsWerkzeugUI extends JDialog {
 		return _result;
 	}
 
-	private void initBottom(JComponent comp) {
-		comp.setLayout(new BoxLayout(
-				comp, BoxLayout.LINE_AXIS));
-
-		// Button - Confirm payment
-		_btnConfirm = new JButton(
-				"Zahlung abschließen");
-		_btnConfirm.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				_result = true;
-				BarzahlungsWerkzeugUI.this.dispose();
-			};
-		});
-		_btnConfirm.setEnabled(false);
+	private JPanel initBottom() {
+		JPanel comp = new JPanel();
+		comp.setLayout(new BoxLayout(comp, BoxLayout.LINE_AXIS));
 
 		comp.add(Box.createHorizontalGlue());
+
 		comp.add(_btnConfirm);
 
-		// Button - Cancel payment
-		_btnCancel = new JButton(
-				"Abbrechen");
-		_btnCancel.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				_result = false;
-				BarzahlungsWerkzeugUI.this.dispose();
-			};
-		});
+		comp.add(Box.createRigidArea(new Dimension(10, 0)));
 
-		comp.add(Box.createRigidArea(new Dimension(
-				10, 0)));
 		comp.add(_btnCancel);
+
+		return comp;
 	}
 
-	private void initCenter(JComponent comp) {
-		comp.setLayout(new BoxLayout(
-				comp, BoxLayout.PAGE_AXIS));
+	private JButton initButtonCancel() {
+		JButton button = new JButton("Abbrechen");
 
-		// ticket list
-		JList<String> menuList = new JList<String>(
-				_ticketArray);
-		menuList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		menuList.setLayoutOrientation(JList.VERTICAL);
-		menuList.setVisibleRowCount(4);
+		button.addActionListener(ae -> {
+			_result = false;
+			BarzahlungsWerkzeugUI.this.dispose();
+		});
 
-		JScrollPane menuScrollPane = new JScrollPane(
-				menuList);
-		menuScrollPane.setMinimumSize(new Dimension(
-				290, 60));
+		return button;
+	}
 
-		JPanel pnlTickets = new JPanel();
-		pnlTickets.setLayout(new GridLayout(
-				1, 1));
-		pnlTickets.setBorder(BorderFactory.createTitledBorder("Tickets"));
-		pnlTickets.add(menuScrollPane);
+	private JButton initButtonConfirm() {
+		JButton button = new JButton("Zahlung abschließen");
+		button.addActionListener(ae -> {
+			_result = true;
+			BarzahlungsWerkzeugUI.this.dispose();
+		});
+		button.setEnabled(false);
 
-		pnlTickets.setMinimumSize(new Dimension(
-				300, 66));
-		comp.add(pnlTickets);
+		return button;
+	}
 
-		// cash input
+	private JPanel initCalcField() {
+
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.setBorder(BorderFactory.createTitledBorder("Rechnung"));
+		panel.setMinimumSize(new Dimension(300, 86));
+		panel.setMaximumSize(new Dimension(1920, 86));
+
+		panel.add(_txtCalc);
+
+		return panel;
+	}
+
+	private JPanel initCashInput() {
+
+		JLabel lbl = new JLabel("Zahlung:");
+
+		JPanel panel = new JPanel();
+		panel.setMinimumSize(new Dimension(150, 24));
+		panel.setMaximumSize(new Dimension(1920, 24));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
+
+		panel.add(Box.createHorizontalGlue());
+		panel.add(lbl);
+		panel.add(Box.createRigidArea(new Dimension(20, 0)));
+		panel.add(_fInpCash);
+		panel.add(Box.createRigidArea(new Dimension(10, 0)));
+
+		return panel;
+	}
+
+	private JPanel initCenter() {
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+
+		panel.add(this.initTicketList());
+
+		panel.add(Box.createRigidArea(new Dimension(0, 14)));
+
+		panel.add(this.initCashInput());
+
+		panel.add(this.initCalcField());
+
+		return panel;
+	}
+
+	private void initInputField() {
 		try {
-			_fInpCash = new JFormattedTextField(
-					new MaskFormatter(
-							"###.##€"));
+			_fInpCash = new JFormattedTextField(new MaskFormatter("###.##€"));
 		}
 		catch (java.text.ParseException e) {
 			System.err.println(e.getMessage());
 		}
 		_fInpCash.setColumns(6);
 		_fInpCash.getDocument()
-		.addDocumentListener(new DocumentListener() {
-			@Override
-			public void changedUpdate(DocumentEvent e) {
-				if (_fInpCash.isEditValid())
-					BarzahlungsWerkzeugUI.this.recalc();
-			}
+			.addDocumentListener(new DocumentListener() {
+				@Override
+				public void changedUpdate(DocumentEvent e) {
+					if (_fInpCash.isEditValid()) BarzahlungsWerkzeugUI.this.recalc();
+				}
 
-			@Override
-			public void insertUpdate(DocumentEvent e) {
-				if (_fInpCash.isEditValid())
-					BarzahlungsWerkzeugUI.this.recalc();
-			}
+				@Override
+				public void insertUpdate(DocumentEvent e) {
+					if (_fInpCash.isEditValid()) BarzahlungsWerkzeugUI.this.recalc();
+				}
 
-			@Override
-			public void removeUpdate(DocumentEvent e) {
-				if (_fInpCash.isEditValid())
-					BarzahlungsWerkzeugUI.this.recalc();
-			}
-		});
+				@Override
+				public void removeUpdate(DocumentEvent e) {
+					if (_fInpCash.isEditValid()) BarzahlungsWerkzeugUI.this.recalc();
+				}
+			});
 		_fInpCash.setText("000.00");
-		_fInpCash.setMaximumSize(new Dimension(
-				80, 30));
-		_fInpCash.setMinimumSize(new Dimension(
-				80, 30));
+		_fInpCash.setMaximumSize(new Dimension(80, 30));
+		_fInpCash.setMinimumSize(new Dimension(80, 30));
+	}
 
-		JLabel lbl = new JLabel(
-				"Zahlung: ");
+	private JTextArea initTextArea() {
+		JTextArea textarea = new JTextArea();
+		textarea.setFont(new Font(Font.MONOSPACED, Font.BOLD, 16));
+		textarea.setBackground(this.getBackground());
 
-		JPanel pnlInput = new JPanel();
-		pnlInput.setMinimumSize(new Dimension(
-				150, 24));
-		pnlInput.setMaximumSize(new Dimension(
-				1920, 24));
+		return textarea;
+	}
 
-		pnlInput.setLayout(new BoxLayout(
-				pnlInput, BoxLayout.LINE_AXIS));
+	private JPanel initTicketList() {
+		JList<String> menuList = new JList<String>(_ticketArray);
+		menuList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		menuList.setLayoutOrientation(JList.VERTICAL);
+		menuList.setVisibleRowCount(4);
 
-		pnlInput.add(Box.createHorizontalGlue());
-		pnlInput.add(lbl);
-		pnlInput.add(Box.createRigidArea(new Dimension(
-				20, 0)));
-		pnlInput.add(_fInpCash);
-		pnlInput.add(Box.createRigidArea(new Dimension(
-				10, 0)));
+		JScrollPane menuScrollPane = new JScrollPane(menuList);
+		menuScrollPane.setMinimumSize(new Dimension(290, 60));
 
-		comp.add(Box.createRigidArea(new Dimension(
-				0, 14)));
-		comp.add(pnlInput);
+		JPanel pnlTickets = new JPanel();
+		pnlTickets.setLayout(new GridLayout(1, 1));
+		pnlTickets.setBorder(BorderFactory.createTitledBorder("Tickets"));
+		pnlTickets.setMinimumSize(new Dimension(300, 66));
 
-		// calc field
-		_txtCalc = new JTextArea();
-		_txtCalc.setFont(new Font(
-				Font.MONOSPACED, Font.BOLD, 16));
-		_txtCalc.setBackground(this.getBackground());
+		pnlTickets.add(menuScrollPane);
 
-		JPanel pnlCalc = new JPanel(
-				new BorderLayout());
-		pnlCalc.setBorder(BorderFactory.createTitledBorder("Rechnung"));
-		pnlCalc.add(_txtCalc);
-
-		pnlCalc.setMinimumSize(new Dimension(
-				300, 86));
-		pnlCalc.setMaximumSize(new Dimension(
-				1920, 86));
-		comp.add(pnlCalc);
+		return pnlTickets;
 	}
 
 	private void recalc() {
-		double inputVal = 0.0;
 		try {
-			inputVal = Double.parseDouble(_fInpCash.getText()
-					.replace("€", "")
-					.replace(" ", ""));
-		}
-		catch (java.lang.NumberFormatException e) {
-			System.err.println(e.getMessage());
-			_txtCalc.setText(String.format(txtNOCALC));
-		}
+			_fInpCash.commitEdit();
+			double inputVal;
+			inputVal = Double.parseDouble(((String) _fInpCash.getValue()).replace("€", ""));
 
-		if (inputVal * 100 < _toPay.getEuroCent()) {
-			_btnConfirm.setEnabled(false);
-			_txtCalc.setText(String.format(txtNOCALC));
+			if (inputVal * 100 >= _toPay.getEuroCent()) this.setConfirmable(inputVal,
+					_toPay.getBetragInDouble());
+			else this.unsetConfirmable(_toPay.getBetragInDouble());
 		}
-		else {
-			_btnConfirm.setEnabled(true);
-			_txtCalc.setText(String.format(txtCALC,
-					_toPay.getBetragInDouble(),
-					inputVal,
-					inputVal - _toPay.getBetragInDouble()));
-		}
+		catch (ParseException e1) {}
+	}
 
+	private void setConfirmable(double input, double toPay) {
+		_btnConfirm.setEnabled(true);
+		_txtCalc.setText(String.format(txtCALC, toPay, input, input - toPay));
+	}
+
+	private void unsetConfirmable(double toPay) {
+		_btnConfirm.setEnabled(false);
+		_txtCalc.setText(String.format(txtNOCALC, toPay));
 	}
 }
