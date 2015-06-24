@@ -27,18 +27,23 @@ import javax.swing.text.MaskFormatter;
 import de.uni_hamburg.informatik.swt.se2.kino.fachwerte.Geldbetrag;
 
 class BarzahlungsWerkzeugUI {
+	// Rückgabewert für getResult()
 	private boolean _result;
 
+	// Informationen zum Anzeigen
 	private final Geldbetrag _toPay;
 	private final String _movie;
 	private final String _hall;
 	private String[] _ticketArray;
 
+	// Ausgabeformat für _txtCalc
 	private final String txtNOCALC = "" + " Zu zahlen:  %6.2f €\n"
 			+ "\n Bitte Eingabefeld anpassen!\n";
 	private final String txtCALC = "" + " Zu zahlen:  %6.2f €\n"
 			+ " --------------------\n" + " Gegeben:    %6.2f €\n"
 			+ " Rückgeld:   %6.2f €";
+
+	// Teil der benötigten Komponenten
 	private JFrame _owner;
 	private JDialog _dialog;
 	private JButton _btnCancel;
@@ -46,8 +51,29 @@ class BarzahlungsWerkzeugUI {
 	private JFormattedTextField _fInpCash;
 	private JTextArea _txtCalc;
 
+	/*
+	 * Initialisert ein neues JDialog-Fenster mit dazugehörigen Komponenten.
+	 *
+	 * @param frame Der Besitzer des JDialogs (darf null sein)
+	 * @param ticketliste Liste mit Tickets
+	 * @param film Der Film für den die Karten sind
+	 * @param kinosaal Der Kinosaal, in dem der Film gezeigt wird
+	 * @param zuZahlen Der Geldbetrag, der zu zahlen ist
+	 *
+	 * @require ticketliste != null
+	 * @require ticketliste.length > 0
+	 * @require film != null
+	 * @require kinosaal != null
+	 * @require zuZahlen.getEuroCent() > 0
+	 */
 	public BarzahlungsWerkzeugUI(JFrame frame, String[] ticketliste, String film,
 			String kinosaal, Geldbetrag zuZahlen) {
+
+		assert ticketliste != null : "precondition violated - null ref";
+		assert ticketliste.length > 0 : "precondition violated";
+		assert film != null : "precondition violated - null ref";
+		assert kinosaal != null : "precondition violated - null ref";
+		assert zuZahlen.getEuroCent() > 0 : "precondition violated";
 
 		_owner = frame;
 		_toPay = zuZahlen;
@@ -64,15 +90,29 @@ class BarzahlungsWerkzeugUI {
 		this.recalc();
 	}
 
+	/*
+	 * Gibt (zB nach erfolgreicher Beendigung) den Zustand der Bezahlung zurück
+	 * (true: Bezahlung erfolgt
+	 * false: Bezahlung abgebrochen)
+	 */
 	public boolean getResult() {
 		return _result;
 	}
 
+	/*
+	 * Zeigt das Dialogfenster (return nach Schließen des Dialogs)
+	 */
 	public void show() {
 		_dialog.setVisible(true);
-
 	}
 
+	/*
+	 * Initialisert das für BorderLayout.SOUTH gedachte Panel
+	 *
+	 * @return Das initialisierte Panel
+	 *
+	 * @ensure result instanceof JPanel && not null
+	 */
 	private JPanel initBottom() {
 		JPanel comp = new JPanel();
 		comp.setLayout(new BoxLayout(comp, BoxLayout.LINE_AXIS));
@@ -88,6 +128,13 @@ class BarzahlungsWerkzeugUI {
 		return comp;
 	}
 
+	/*
+	 * Baut den Button zum Abbrechen des Bezahlvorgangs
+	 *
+	 * @return Der initialisierte Button
+	 *
+	 * @ensure result instanceof JButton && not null
+	 */
 	private JButton initButtonCancel() {
 		JButton button = new JButton("Abbrechen");
 
@@ -99,6 +146,13 @@ class BarzahlungsWerkzeugUI {
 		return button;
 	}
 
+	/*
+	 * Baut den Button zum Bestätigen des Bezahlvorgangs
+	 *
+	 * @return Der initialisierte Button
+	 *
+	 * @ensure result instanceof JButton && not null
+	 */
 	private JButton initButtonConfirm() {
 		JButton button = new JButton("Zahlung abschließen");
 		button.addActionListener(ae -> {
@@ -110,6 +164,13 @@ class BarzahlungsWerkzeugUI {
 		return button;
 	}
 
+	/*
+	 * Baut das Panel für die Kalkulation des Wechselgeldes
+	 *
+	 * @return Das initialisierte Panel
+	 *
+	 * @ensure result instanceof JPanel && not null
+	 */
 	private JPanel initCalcField() {
 
 		JPanel panel = new JPanel(new BorderLayout());
@@ -122,6 +183,13 @@ class BarzahlungsWerkzeugUI {
 		return panel;
 	}
 
+	/*
+	 * Baut das Panel für das Eingabefeld
+	 *
+	 * @return Das initialisierte Panel
+	 *
+	 * @ensure result instanceof JPanel && not null
+	 */
 	private JPanel initCashInput() {
 
 		JLabel lbl = new JLabel("Zahlung:");
@@ -140,6 +208,13 @@ class BarzahlungsWerkzeugUI {
 		return panel;
 	}
 
+	/*
+	 * Initialisert das für BorderLayout.CENTER gedachte Panel
+	 *
+	 * @return Das initialisierte Panel
+	 *
+	 * @ensure result instanceof JPanel && not null
+	 */
 	private JPanel initCenter() {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
@@ -155,6 +230,13 @@ class BarzahlungsWerkzeugUI {
 		return panel;
 	}
 
+	/*
+	 * Instanziert das Dialogfenster selbst
+	 *
+	 * @return Das initialiserte Dialogfenster
+	 *
+	 * @ensure result instanceof JDialog && not null
+	 */
 	private JDialog initDialog() {
 		JDialog dialog = new JDialog(_owner, String.format("Barzahlung - %s - %s",
 				_movie, _hall));
@@ -183,6 +265,9 @@ class BarzahlungsWerkzeugUI {
 		return dialog;
 	}
 
+	/*
+	 * Baut das Eingabefeld (_fInputCash)
+	 */
 	private void initInputField() {
 		try {
 			_fInpCash = new JFormattedTextField(new MaskFormatter("###.##€"));
@@ -213,6 +298,13 @@ class BarzahlungsWerkzeugUI {
 		_fInpCash.setMinimumSize(new Dimension(80, 30));
 	}
 
+	/*
+	 * Baut das Textfeld
+	 *
+	 * @return Die JTextArea
+	 *
+	 * @ensure result instanceof JTextArea && not null
+	 */
 	private JTextArea initTextArea() {
 		JTextArea textarea = new JTextArea();
 		textarea.setFont(new Font(Font.MONOSPACED, Font.BOLD, 16));
@@ -220,6 +312,13 @@ class BarzahlungsWerkzeugUI {
 		return textarea;
 	}
 
+	/*
+	 * Baut das JPanel mit der Ticketauflistung
+	 *
+	 * @return Das JPanel
+	 *
+	 * @ensure result instanceof JPanel && not null
+	 */
 	private JPanel initTicketList() {
 		JList<String> menuList = new JList<String>(_ticketArray);
 		menuList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -239,6 +338,11 @@ class BarzahlungsWerkzeugUI {
 		return pnlTickets;
 	}
 
+	/*
+	 * Prüft den Text des Textfelds (_fInpCash) auf ein validen Doublewert
+	 * und bestimmt, ob der Bestätigungsbutton freigeschaltet wird/ob
+	 * das Textareal eine Berechnung anzeigen soll.
+	 */
 	private void recalc() {
 		try {
 			_fInpCash.commitEdit();
@@ -252,12 +356,35 @@ class BarzahlungsWerkzeugUI {
 		catch (ParseException e1) {}
 	}
 
+	/*
+	 * Schaltet den Bestätigungsbutton frei
+	 * und bereitet das Textfeld
+	 *
+	 * @param input der vorgelegte Betrag
+	 * @param toPay der zu bezahlende Betrag
+	 *
+	 * @require input > 0
+	 * @require toPay > 0
+	 */
 	private void setConfirmable(double input, double toPay) {
+		assert input > 0 : "precondition violated";
+		assert toPay > 0 : "precondition violated";
+
 		_btnConfirm.setEnabled(true);
 		_txtCalc.setText(String.format(txtCALC, toPay, input, input - toPay));
 	}
 
+	/*
+	 * Blockiert den Bestätigungsbutton
+	 * und bescheibt das Textfeld
+	 *
+	 * @param toPay der zu bezahlende Betrag
+	 *
+	 * @require toPay > 0
+	 */
 	private void unsetConfirmable(double toPay) {
+		assert toPay > 0 : "precondition violated";
+
 		_btnConfirm.setEnabled(false);
 		_txtCalc.setText(String.format(txtNOCALC, toPay));
 	}
