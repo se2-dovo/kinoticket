@@ -29,6 +29,8 @@ public class PlatzVerkaufsWerkzeug
 
     private PlatzVerkaufsWerkzeugUI _ui;
 
+    private BarzahlungsWerkzeug _zahlung;
+
     /**
      * Initialisiert das PlatzVerkaufsWerkzeug.
      */
@@ -38,6 +40,8 @@ public class PlatzVerkaufsWerkzeug
         registriereUIAktionen();
         // Am Anfang wird keine Vorstellung angezeigt:
         setVorstellung(null);
+
+        _zahlung = new BarzahlungsWerkzeug();
     }
 
     /**
@@ -219,11 +223,9 @@ public class PlatzVerkaufsWerkzeug
     {
         Set<Platz> plaetze = _ui.getPlatzplan()
             .getAusgewaehltePlaetze();
-        if (BarzahlungsWerkzeug.performPayment(plaetze, vorstellung))
-        {
-            vorstellung.verkaufePlaetze(plaetze);
-            aktualisierePlatzplan();
-        }
+        _zahlung.setSetting(vorstellung, plaetze);
+        _zahlung.performPayment();
+        aktualisierePlatzplan();
     }
 
     /**
